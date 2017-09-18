@@ -53,7 +53,7 @@ for i = 1:npts
 %     else
 %     end
     neighbor = pts(index(i,:),:); % k近邻  
-    coefs = princomp(neighbor);    
+    coefs = pca(neighbor);    
     x = [neighbor * coefs(:, 1), neighbor * coefs(:, 2)];
     
     % 找邻域是包含索引为1的顶点的一环邻域

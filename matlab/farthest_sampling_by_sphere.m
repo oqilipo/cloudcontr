@@ -13,7 +13,7 @@ function [spls, corresp] = farthest_sampling_by_sphere(pts, RADIUS)
 % @version 2.0
 
 %% visual debug conditions
-SHOW_SAMPLING_PROGRESS = true;
+SHOW_SAMPLING_PROGRESS = false;
 SHOW_RESULTS = false;
 
 %%
@@ -33,25 +33,25 @@ corresp = zeros( length(pts), 1 );
 mindst = nan( length(pts), 1 ); % mindst(i) is the min distance of pts(i) to the sample piont corresp(i) 
 
 for k=1:length(pts)
-    if corresp(k)~=0, continue, end;
+    if corresp(k)~=0, continue, end
         
     %--- query all the points for distances
     mindst(k) = inf; % make sure picked first
     
     %--- initialize the priority queue
     while ~all(corresp~=0) %~isempty( find(corresp==0, 1) )
-        [maxValue, maxIdx] = max( mindst );
+        [~, maxIdx] = max(mindst);
         if mindst(maxIdx) == 0
             break
         end
 
         % query its delta-neighborhood
-        [nIdxs, nDsts] = kdtree_ball_query( kdtree,pts(maxIdx,:), RADIUS );%original
+        [nIdxs, nDsts] = kdtree_ball_query(kdtree, pts(maxIdx,:), RADIUS);% original
         % if maxIdx and all its neighborhood has been marked, skip ahead
         if all( corresp(nIdxs) ~= 0 )
             mindst(maxIdx) = 0; 
             continue;
-        end;
+        end
 
         % create new node and update (closest) distances
         spls(end+1,:) = pts(maxIdx,:); %#ok<AGROW>
@@ -68,7 +68,7 @@ for k=1:length(pts)
     end
 end
 toc
-kdtree_delete( kdtree );
+kdtree_delete(kdtree);
 
 if SHOW_RESULTS && ~SHOW_SAMPLING_PROGRESS
     plot3( spls(:,1), spls(:,2), spls(:,3), '*g');

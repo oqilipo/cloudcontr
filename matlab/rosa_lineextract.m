@@ -13,7 +13,7 @@ function P = rosa_lineextract(P, RADIUS, bUpdateConnectivity)
 % graph
 % @reform-data:     2010-8-20  decompose the original function into several
 % small functions.
-SHOW_RESULTS = true;
+SHOW_RESULTS = false;
 
 options.collapse_order = 1;
 if (bUpdateConnectivity)
@@ -27,7 +27,7 @@ else
 end
 
 %%
-if (SHOW_RESULTS)
+if SHOW_RESULTS
     figure; movegui('northeast');set(gcf,'color','white');hold on;
     plot3( P.spls(:,1), P.spls(:,2), P.spls(:,3), '.r', 'markersize', 5);
     axis off; axis equal;set(gcf,'Renderer','OpenGL');

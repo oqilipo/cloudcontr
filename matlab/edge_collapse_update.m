@@ -22,8 +22,8 @@ options.null = 0;
 collapse_order = getoptions(options, 'collapse_order', '0'); 
 
 %% visual debug conditions
-SHOW_COLLAPSE_PROGRESS = true;
-SHOW_RESULTS = true;
+SHOW_COLLAPSE_PROGRESS = false;
+SHOW_RESULTS = false;
 
 if SHOW_COLLAPSE_PROGRESS || SHOW_RESULTS
     close all;

@@ -33,19 +33,18 @@ function [cpts, t, initWL, WC, sl] = contraction_by_mesh_laplacian(P, options)
 
 if nargin < 1
     clear;clc;close all;
-    P.filename = '../data/simplejoint_v4770.off'; 
+    P.filename = '../data/simplejoint_v4770.off';
     options.USING_POINT_RING = GS.USING_POINT_RING;
     options.iterate_time = 10;
-[P.pts,P.faces] = read_mesh(P.filename);
-P.npts = size(P.pts,1);
-P.pts = GS.normalize(P.pts);
-[P.bbox, P.diameter] = GS.compute_bbox(P.pts);
-
-P.k_knn = GS.compute_k_knn(P.npts);  
-atria = nn_prepare(P.pts); 
-[P.knn_idx, P.knn_dist] = nn_search(P.pts, atria, P.pts, P.k_knn); 
-P.rings = compute_point_point_ring(P.pts,P.k_knn, P.knn_idx);
-% P.rings = compute_vertex_face_ring(P.faces);
+    [P.pts,P.faces] = read_mesh(P.filename);
+    P.npts = size(P.pts,1);
+    P.pts = GS.normalize(P.pts);
+    [P.bbox, P.diameter] = GS.compute_bbox(P.pts);
+    P.k_knn = GS.compute_k_knn(P.npts);
+    atria = nn_prepare(P.pts);
+    [P.knn_idx, P.knn_dist] = nn_search(P.pts, atria, P.pts, P.k_knn);
+    P.rings = compute_point_point_ring(P.pts,P.k_knn, P.knn_idx);
+    % P.rings = compute_vertex_face_ring(P.faces);
 end
 
 %##########################################################################
@@ -53,7 +52,7 @@ end
 %##########################################################################
 % visual debug conditions
 RING_SIZE_TYPE = 1;%1:min, 2:mean, 3:max
-SHOW_CONTRACTION_PROGRESS = true;
+SHOW_CONTRACTION_PROGRESS = false;
 Laplace_type = 'conformal';%conformal%combinatorial%spring%mvc
 
 % setting
@@ -74,9 +73,14 @@ WH = ones(P.npts, 1)*WC; % 初始约束权
 sl = getoptions(options, 'sl', GS.LAPLACIAN_CONSTRAINT_SCALE); % scale factor for WL in each iteration! in original paper is 2;
 WL = initWL;%*sl;
 
-sprintf(['1) k of knn: %d\n 2) termination condition: %f \n 3)' ...
-    'Init Contract weight: %f\n 4) Init handle weight: %f\n 5) Contract scalar: %f\n' ...
-    '6) Max iter steps: %d'], P.k_knn, tc, initWL, WC, sl,iterate_time)
+fprintf([...
+    '1) k of knn: %d\n' ...
+    '2) termination condition: %f \n' ...
+    '3) Init Contract weight: %f \n' ...
+    '4) Init handle weight: %d \n' ...
+    '5) Contract scalar: %d \n' ...
+    '6) Max iter steps: %d \n'], ...
+    P.k_knn, tc, initWL, WC, sl,iterate_time)
 
 %% init iteration
 t = 1; % current iteration step
@@ -93,7 +97,7 @@ A = [L.*WL;sparse(1:P.npts,1:P.npts, WH)];
 b = [zeros(P.npts,3);sparse(1:P.npts,1:P.npts, WH)*P.pts];
 cpts = (A'*A)\(A'*b); 
 % newVertices = A\b; % this is slow than above line
-disp(sprintf('solve equation:'));
+fprintf('solve equation:\n');
 toc
 
 if SHOW_CONTRACTION_PROGRESS
@@ -104,7 +108,7 @@ if SHOW_CONTRACTION_PROGRESS
     h2 = scatter3(cpts(:,1),cpts(:,2), cpts(:,3),10,'r','filled');
     %legend('orignal points','contracted points');
     title(['iterate ',num2str(t),' time(s)'])    
-    disp(sprintf('draw mesh:'));
+    fprintf('draw mesh:\n');
     toc
 end
 %%
@@ -124,7 +128,7 @@ else
     a(t) = mean(ratio_new);%sum(ratio_new)/sum(ratio);
 end
 
-disp(sprintf('compute area:'));
+fprintf('compute area:\n');
 toc
 
 % mwrite(['A' num2str(t) '.txt'], A);
@@ -132,7 +136,7 @@ toc
 % mwrite(['sizes' num2str(t) '.txt'], sizes);
 % mwrite(['size_new' num2str(t) '.txt'], size_new);
 % mwrite(['newVertices' num2str(t) '.txt'], cpts);
-
+fprintf('Iteration: %d', t')
 while t<iterate_time
     if options.USING_POINT_RING
         L = -compute_point_laplacian(cpts,Laplace_type, P.rings, options);%conformal
@@ -142,7 +146,7 @@ while t<iterate_time
     end
     
     WL = sl*WL;    
-    if WL>GS.MAX_LAPLACIAN_CONSTRAINT_WEIGHT,WL=GS.MAX_LAPLACIAN_CONSTRAINT_WEIGHT;end; % from Oscar08's implementation, 2048
+    if WL>GS.MAX_LAPLACIAN_CONSTRAINT_WEIGHT,WL=GS.MAX_LAPLACIAN_CONSTRAINT_WEIGHT;end % from Oscar08's implementation, 2048
     if options.USING_POINT_RING
         if strcmp(Laplace_type,'mvc')
             WH = WC.*(sizes./size_new)*10;% 初始约束权
@@ -184,7 +188,8 @@ while t<iterate_time
         cpts = tmp;
     end
     
-    t = t+1
+    t = t+1;
+    fprintf('\b%d', t);
     
     if SHOW_CONTRACTION_PROGRESS
         % 显示前后点云     
@@ -196,6 +201,7 @@ while t<iterate_time
     end
 end
 clear tmp;
+fprintf('\n')
 
 if SHOW_CONTRACTION_PROGRESS
     figure;

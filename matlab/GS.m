@@ -1,20 +1,18 @@
 classdef GS
     % global settings    
     properties (Constant)
-        USING_POINT_RING = true; % false for Oscar, ture for our implementation
-%         PC_COLOR = {1, .73, .0, 0.5f}; // gold
-%         PC_COLOR = {0.275, .337, .60, 0.5f}; // blue
+        USING_POINT_RING = true; % false for Oscar, true for our implementation
         PC_COLOR = [1.0, .65, .35]; % point cloud color, orange
         MIN_NEIGHBOR_NUM = 8;
         MAX_NEIGHBOR_NUM = 30;% orginal 30
         
-        LAPLACIAN_CONSTRAINT_WEIGHT = 3; % init Laplacian contraction weight, compute automatically now.
-        POSITION_CONSTRAINT_WEIGHT = 1; % init position constraint weight
-        LAPLACIAN_CONSTRAINT_SCALE = 3; % scalar for increasing WL in each iteration
-        MAX_LAPLACIAN_CONSTRAINT_WEIGHT = 2048;%2048
-        MAX_POSITION_CONSTRAINT_WEIGHT = 10000;%10000
-        MAX_CONTRACT_NUM = 20; % max contract iterations 20
-        CONTRACT_TERMINATION_CONDITION = 0.01;% contract Termination Conditions for total area ratio 0.01         
+        LAPLACIAN_CONSTRAINT_WEIGHT = 3; % init Laplacian contraction weight, compute automatically now: 3
+        POSITION_CONSTRAINT_WEIGHT = 1; % init position constraint weight: 1
+        LAPLACIAN_CONSTRAINT_SCALE = 3; % scalar for increasing WL in each iteration: 3
+        MAX_LAPLACIAN_CONSTRAINT_WEIGHT = 2048; % 2048
+        MAX_POSITION_CONSTRAINT_WEIGHT = 10000; % 10000
+        MAX_CONTRACT_NUM = 20; % max contract iterations: 20
+        CONTRACT_TERMINATION_CONDITION = 0.01;% contract Termination Conditions for total area ratio: 0.01         
     end
     
     methods (Static)
@@ -55,7 +53,7 @@ classdef GS
                     if GS.USING_POINT_RING
                         ms = GS.one_ring_size(PS.pts,PS.rings,2);
                         wl = 1.0/(5.0*mean(ms));
-%                     wl = max(3, 0.1*(npts)^0.5); % original guess of JJCAO                        
+                        % wl = max(3, 0.1*(npts)^0.5); % original guess of JJCAO
                     else                        
                         wl = 1.0/(10.0*sqrt(GS.average_face_area(PS.pts,PS.faces))); % implementation of Oscar08    
                     end
@@ -63,7 +61,7 @@ classdef GS
                     if GS.USING_POINT_RING
                         ms = GS.one_ring_size(PS.pts,PS.rings,2);
                         wl = 1.0/(5.0*mean(ms));
-%                     wl = max(3, 0.1*(npts)^0.5); % original guess of JJCAO                        
+                        % wl = max(3, 0.1*(npts)^0.5); % original guess of JJCAO
                     else                        
                         wl = 1.0/(10.0*sqrt(GS.average_face_area(PS.pts,PS.faces))); % implementation of Oscar08    
                     end
