@@ -1,4 +1,4 @@
-function [] = eg_skeleton_laplacian_rosa(filename)
+function P = eg_skeleton_laplacian_rosa(filename)
 % extract curve skeleton from a point cloud or triangular mesh
 % update: 2010-8-19
 % update: 2010-7-12
@@ -43,7 +43,7 @@ toc
 
 %% Step 1: Contract point cloud by Laplacian
 tic
-[P.cpts, t, initWL, WC, sl] = contraction_by_mesh_laplacian(P, options);
+[P.cpts, t, initWL, WC, sl] = contraction_by_mesh_laplacian(P, options); %#ok<ASGLU>
 fprintf('Contraction:\n');
 toc
 %% Step 2: Point to curve C by cluster ROSA2.0
@@ -65,7 +65,3 @@ scatter3(P.pts(:,1),P.pts(:,2),P.pts(:,3),20,'.','MarkerEdgeColor', GS.PC_COLOR)
 showoptions.sizep=400;showoptions.sizee=2;
 plot_skeleton(P.spls, P.spls_adj, showoptions);
 axis off;axis equal;
-%% Save results
-% default_filename = sprintf('%s_contract_t(%d)_nn(%d)_WL(%f)_WH(%f)_sl(%f)_skeleton.mat',...
-%     P.filename(1:end-4), t, P.k_knn, initWL, WC, sl);
-% save(default_filename,'P');

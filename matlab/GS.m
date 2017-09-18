@@ -5,7 +5,6 @@ classdef GS
         PC_COLOR = [1.0, .65, .35]; % point cloud color, orange
         MIN_NEIGHBOR_NUM = 8;
         MAX_NEIGHBOR_NUM = 30;% orginal 30
-        
         LAPLACIAN_CONSTRAINT_WEIGHT = 3; % init Laplacian contraction weight, compute automatically now: 3
         POSITION_CONSTRAINT_WEIGHT = 1; % init position constraint weight: 1
         LAPLACIAN_CONSTRAINT_SCALE = 3; % scalar for increasing WL in each iteration: 3
@@ -32,7 +31,7 @@ classdef GS
         end
         function [] = test_normalize(pts)
             pts = GS.normalize(pts);
-            [bbox, diameter] = GS.compute_bbox(pts);
+            [bbox, ~] = GS.compute_bbox(pts);
             tmp = max(bbox(4:6)-bbox(1:3));
             if abs(tmp-1.0) > eps
                 warning('GS.normalize() is wrong! the bounding box diagonal is: "%s" ', tmp);
